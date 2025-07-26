@@ -548,113 +548,61 @@ $ ODOO_DB=mydatabase ODOO_USER=myusername ODOO_PW=mypassword ODOO_PORT=8080 ODOO
 - [Odoo Docs](https://www.odoo.com/documentation/14.0)
 - [Odoo External API](https://www.odoo.com/documentation/14.0/webservices/odoo.html)
 
-## Changelog
+## 🧪 Testing
 
-### Enhanced Fork by @renanteixeira
+This enhanced fork includes a comprehensive test suite with 37 tests covering security validations and backward compatibility.
 
-#### 3.5.0 (Enhanced Fork - July 2025)
+### Running Tests
 
-**🔒 Major Security & Validation Release**
+```bash
+# Set environment variables
+export ODOO_DB=your_test_database
+export ODOO_USER=admin
+export ODOO_PW=your_password
+export ODOO_BASE_URL=http://localhost
+export ODOO_PORT=8069
 
-1. **[SECURITY]** Add comprehensive input validation for all CRUD methods
-   - Constructor parameter validation (database, username, password, baseUrl)
-   - Model name validation (non-empty strings required)  
-   - Record ID validation (positive integers only)
-   - Parameters object validation for all methods
+# Run all tests (30 security + 7 compatibility)
+npm test
 
-2. **[SECURITY]** Implement connection security improvements
-   - 30-second connection timeout to prevent hanging
-   - Error message sanitization (no password exposure)
-   - Enhanced authentication failure handling
+# Run only security tests
+npx mocha test/integration.enhanced.test.js
 
-3. **[SECURITY]** Add parameter sanitization and SQL injection prevention
-   - URL validation and protocol checking
-   - Type checking for all user inputs
-   - Safe handling of malformed inputs
+# Run only compatibility tests  
+npx mocha test/integration.test.js
+```
 
-4. **[TESTING]** Add comprehensive test suite
-   - 30 new security-focused tests
-   - Maintain 100% backward compatibility (all 7 original tests pass)
-   - Performance and concurrent operation testing
-   - CI/CD ready with environment variable configuration
+### Test Coverage
 
-5. **[MAINTENANCE]** Package improvements
-   - Transform to scoped package `@renanteixeira/odoo-await`
-   - Update dependencies and fix npm audit vulnerabilities
-   - Update mocha to v11.7.1 (security fixes)
-   - Enhanced documentation with security guidelines
+- ✅ **Constructor Validation** (5 tests) - Parameter validation, URL parsing, port configuration
+- ✅ **Connection Security** (2 tests) - Timeout handling, authentication failure
+- ✅ **CRUD Method Validation** (21 tests) - Parameter validation for all CRUD operations
+- ✅ **Security Tests** (2 tests) - Error sanitization, malformed input handling  
+- ✅ **Performance Tests** (1 test) - Bulk operations efficiency
+- ✅ **Backward Compatibility** (7 tests) - Ensures original functionality is preserved
 
-6. **[DOCUMENTATION]** Comprehensive documentation updates
-   - Security features documentation
-   - Migration guide from original package
-   - Enhanced API documentation with validation examples
-   - Development tooling and Docker setup guide
+## 🔄 Migration from Original
 
-**Total Test Coverage**: 37 tests (30 security + 7 compatibility)  
-**Breaking Changes**: None - 100% backward compatible  
-**Security Improvements**: All CRUD methods now include comprehensive validation
+This fork is **100% backward compatible**. Simply update your installation:
 
----
+```bash
+# Replace original package
+npm uninstall odoo-await
+npm install @renanteixeira/odoo-await
 
-### Original Package Versions (by @vettloffah)
+# Update your imports
+const Odoo = require('@renanteixeira/odoo-await'); // Was: require('odoo-await')
 
-#### 3.4.1
+# All existing code works unchanged!
+```
 
-1. Fix type declarations
+### Benefits of Migrating
 
-#### 3.4
-
-1. Type declarations from PR [#34](https://github.com/vettloffah/odoo-await/pull/34). thanks to @bebjakub for the contribution.
-
-#### 3.3.2
-
-1. Merge PR [#30](https://github.com/vettloffah/odoo-await/pull/30) for basic auth
-
-#### 3.3.1
-
-1. Update packages for bulnerabilities.
-   option, contribution by @aharter.
-
-#### 3.3.0
-
-1. Add `action()` method to execute specified server action on record(s).
-
-#### 3.2.0
-
-1. Add support for url basic auth. Thanks to @aharter for the contribution - [PR #7](https://github.com/vettloffah/odoo-await/pull/17)
-
-#### 3.1.0
-
-1. Replaced deprecated `querystring` package with global URL.
-2. Removed some tests that might fail on databases that already have records in them.
-
-#### 3.0.0
-
-1. Port now defaults to protocol. So, `https` defaults to 443, and `http` defaults to 80. Port 8069 is no longer default,
-   which makes this a breaking change. Version updated to 3.0. Thanks to @ajmas for the contribution.
-
-#### 2.4.0
-
-1. Add `context` option to `searchRead()` method (thanks to @tomas-padrieza)
-
-#### 2.3.0
-
-1. Add support for logical operators while searching
-
-#### 2.2.3
-
-1. Update readme
-
-#### 2.2.2
-
-1. Remove console log on successful connection - [PR #15](https://github.com/vettloffah/odoo-await/pull/15)
-2. Update dependency glob-parent
-3. Updated readme
-
-#### 2.2.0
-
-1. [Feature] - Now supports sorting records returned by the `searchRead()` function. Thanks to @tsogoo for the PR.
-   See [other API methods](#other-odoo-api-methods) below.
+- 🔒 **Enhanced Security**: Input validation and error sanitization
+- ⏱️ **Reliability**: Connection timeouts prevent hanging
+- 🧪 **Quality**: 30 additional security tests  
+- 📚 **Documentation**: Comprehensive security documentation
+- 🔧 **Maintenance**: Actively maintained with updated dependencies
 
 ## 🧪 Testing
 
@@ -814,11 +762,12 @@ For detailed setup instructions, see [Multi-Version Setup Guide](./MULTI_VERSION
 
 ## 📚 Additional Resources
 
-- [Multi-Version Docker Setup Guide](./MULTI_VERSION_README.md)
-- [Security Improvements Documentation](./SECURITY_IMPROVEMENTS.md)
-- [Original odoo-await Documentation](https://github.com/vettloffah/odoo-await)
-- [Odoo External API Documentation](https://www.odoo.com/documentation/14.0/webservices/odoo.html)
-- [Odoo Domain Filters Reference](https://www.odoo.com/documentation/14.0/reference/orm.html#reference-orm-domains)
+- [📋 **Changelog**](./CHANGELOG.md) - Complete version history and release notes
+- [🐳 Multi-Version Docker Setup Guide](./MULTI_VERSION_README.md)
+- [🔒 Security Improvements Documentation](./SECURITY_IMPROVEMENTS.md)
+- [📖 Original odoo-await Documentation](https://github.com/vettloffah/odoo-await)
+- [🔗 Odoo External API Documentation](https://www.odoo.com/documentation/14.0/webservices/odoo.html)
+- [🔍 Odoo Domain Filters Reference](https://www.odoo.com/documentation/14.0/reference/orm.html#reference-orm-domains)
 
 ---
 
