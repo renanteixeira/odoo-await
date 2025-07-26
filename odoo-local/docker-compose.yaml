@@ -15,20 +15,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-  kwkhtmltopdf:
-    image: ghcr.io/acsone/kwkhtmltopdf:0.12.6.1-latest
-    ports:
-      - ${KWKHTMLTOPDF_PORT}:8080
-    env_file:
-      - .env
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/version"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
   odoo:
-    image: odoo-await-odoo:12.0
+    image: odoo-await-odoo:13.0
     build:
       context: .
     env_file:
@@ -39,19 +27,18 @@ services:
     volumes:
       - odoo-datadir:/data/odoo
       - odoo-home:/root
-      - odoo-python:/odoo/lib/python3.6
+      - odoo-python:/odoo/lib/python3.7
     depends_on:
       - db
-      - kwkhtmltopdf
     links:
       - db
-      - kwkhtmltopdf
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8069"]
-      interval: 10s
-      timeout: 20s
+      interval: 30s
+      timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 60s
+
 volumes:
   db-data:
   odoo-datadir:
