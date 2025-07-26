@@ -5,8 +5,17 @@
 [![npm version](https://badge.fury.io/js/%40renanteixeira%2Fodoo-await.svg)](https://badge.fury.io/js/%40renanteixeira%2Fodoo-await)
 [![Tests](https://img.shields.io/badge/tests-37%20passing-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
 [![Security](https://img.shields.io/badge/security-enhanced-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Odoo 12.0](https://img.shields.io/badge/Odoo-12.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Odoo 13.0](https://img.shields.io/badge/Odoo-13.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Odoo 14.0](https://img.shields.io/badge/Odoo-14.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Odoo 15.0](https://img.shields.io/badge/Odoo-15.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Odoo 16.0](https://img.shields.io/badge/Odoo-16.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Odoo 17.0](https://img.shields.io/badge/Odoo-17.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Odoo 18.0](https://img.shields.io/badge/Odoo-18.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
 
 This is an **enhanced and security-focused fork** of the original [odoo-await](https://github.com/vettloffah/odoo-await) library, built with promises for async/await usage. Features comprehensive input validation, error sanitization, timeout handling, and robust security improvements while maintaining 100% backward compatibility.
+
+**✨ NEW: Multi-Version Docker Environment** - Test your code against Odoo versions 12.0 through 18.0 simultaneously! See [Multi-Version Setup Guide](./MULTI_VERSION_README.md).
 
 ## 🔒 Why This Enhanced Fork?
 
@@ -18,6 +27,8 @@ This is an **enhanced and security-focused fork** of the original [odoo-await](h
 | Security Tests | ❌ Basic (7 tests) | ✅ Comprehensive (37 tests) |
 | SQL Injection Prevention | ❌ None | ✅ Parameter sanitization |
 | Type Checking | ❌ Basic | ✅ Strict validation |
+| Odoo Version Support | ❌ Single version testing | ✅ Multi-version (12.0-18.0) |
+| Docker Environment | ❌ Basic setup | ✅ Multi-version testing environment |
 | Last Updated | ❌ Over 1 year ago | ✅ Actively maintained |
 
 ## 📦 Installation
@@ -757,16 +768,53 @@ git clone https://github.com/renanteixeira/odoo-await.git
 cd odoo-await
 npm install
 
-# Setup test environment (requires Docker)
+# Quick start with multi-version environment
+./manage-odoo.sh init
+
+# Or setup single version for basic development (Odoo 12.0)
 cd odoo-local/12.0
 docker-compose up -d
 
-# Run tests
+# Run tests against all versions
+./manage-odoo.sh test
+
+# Run tests against single version
 npm test
 ```
 
+## 🐳 Multi-Version Docker Environment
+
+This project includes a comprehensive Docker setup for testing against multiple Odoo versions simultaneously:
+
+- **Supported Versions**: Odoo 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0
+- **Automated Setup**: One command initialization
+- **Individual Databases**: Each version has its own PostgreSQL database
+- **Port Mapping**: Sequential ports (12069, 13069, 14069, etc.)
+
+### Quick Commands
+
+```bash
+# Initialize all Odoo versions (first time)
+./manage-odoo.sh init
+
+# Start all services
+./manage-odoo.sh start
+
+# Test library against all versions
+./manage-odoo.sh test
+
+# View all access URLs
+./manage-odoo.sh urls
+
+# Check services status
+./manage-odoo.sh status
+```
+
+For detailed setup instructions, see [Multi-Version Setup Guide](./MULTI_VERSION_README.md).
+
 ## 📚 Additional Resources
 
+- [Multi-Version Docker Setup Guide](./MULTI_VERSION_README.md)
 - [Security Improvements Documentation](./SECURITY_IMPROVEMENTS.md)
 - [Original odoo-await Documentation](https://github.com/vettloffah/odoo-await)
 - [Odoo External API Documentation](https://www.odoo.com/documentation/14.0/webservices/odoo.html)
