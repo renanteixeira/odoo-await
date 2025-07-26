@@ -1,0 +1,77 @@
+name: Publish to NPM
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Initialize multi-version environment
+      run: |
+        chmod +x ./manage-odoo.sh
+        chmod +x ./init-all-odoo.sh
+        chmod +x ./test-all-versions.sh
+        ./manage-odoo.sh init
+
+    - name: Run all tests
+      run: ./manage-odoo.sh test
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Publish to NPM
+      run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## Changes in this Release
+          - Enhanced security validations
+          - Multi-version Odoo support (12.0-18.0)
+          - Comprehensive test suite (37 tests)
+          - Docker environment for development
+          
+          ## Supported Odoo Versions
+          - ✅ Odoo 12.0
+          - ✅ Odoo 13.0
+          - ✅ Odoo 14.0
+          - ✅ Odoo 15.0
+          - ✅ Odoo 16.0
+          - ✅ Odoo 17.0
+          - ✅ Odoo 18.0
+        draft: false
+        prerelease: false
