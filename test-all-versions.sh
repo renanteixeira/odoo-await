@@ -32,21 +32,31 @@ for i in "${!versions[@]}"; do
     
     # Wait for service to be ready
     echo "⏳ Waiting for Odoo ${version}.0 to be ready..."
-    timeout 60 bash -c "until curl -s http://localhost:${port} > /dev/null; do sleep 2; done" || {
+    if timeout 60 bash -c "until curl -s http://localhost:${port} > /dev/null; do sleep 2; done"; then
+        echo "✅ Odoo ${version}.0 is ready!"
+    else
         echo -e "${RED}❌ Odoo ${version}.0 did not respond in 60 seconds${NC}"
         ((failed++))
         continue
-    }
+    fi
     
     # Run tests specific to this version
     echo "🧪 Running tests..."
-    if ODOO_DB=odoo${version} ODOO_USER=admin ODOO_PW=admin ODOO_BASE_URL=http://localhost:${port} npm test; then
+    export ODOO_DB="odoo${version}"
+    export ODOO_USER="admin"
+    export ODOO_PW="admin"
+    export ODOO_BASE_URL="http://localhost:${port}"
+    
+    if npm test --silent; then
         echo -e "${GREEN}✅ Odoo ${version}.0 - PASSED all tests!${NC}"
         ((passed++))
     else
         echo -e "${RED}❌ Odoo ${version}.0 - FAILED tests!${NC}"
         ((failed++))
     fi
+    
+    # Clear environment variables
+    unset ODOO_DB ODOO_USER ODOO_PW ODOO_BASE_URL
 done
 
 echo ""
