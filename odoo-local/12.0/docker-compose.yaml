@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:13
+    env_file:
+      - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - ${EXTERNAL_DB_PORT}:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  kwkhtmltopdf:
+    image: ghcr.io/acsone/kwkhtmltopdf:0.12.6.1-latest
+    ports:
+      - ${KWKHTMLTOPDF_PORT}:8080
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  odoo:
+    image: odoo-await-odoo:12.0
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - ${ODOO_PORT}:8069
+      - ${ODOO_WEBSOCKET_PORT}:8072
+    volumes:
+      - odoo-datadir:/data/odoo
+      - odoo-home:/root
+      - odoo-python:/odoo/lib/python3.6
+    depends_on:
+      - db
+      - kwkhtmltopdf
+    links:
+      - db
+      - kwkhtmltopdf
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8069"]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+      start_period: 30s
+volumes:
+  db-data:
+  odoo-datadir:
+  odoo-home:
+  odoo-python:
