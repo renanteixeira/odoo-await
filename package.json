@@ -1,6 +1,6 @@
 {
   "name": "@renanteixeira/odoo-await",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "Enhanced Odoo API client with comprehensive security validations - Fork of odoo-await",
   "main": "lib/index.js",
   "directories": {
@@ -20,7 +20,7 @@
   },
   "keywords": [
     "odoo",
-    "xmlrpc", 
+    "xmlrpc",
     "api",
     "async",
     "security",
@@ -32,7 +32,7 @@
     "xmlrpc": "^1.3.2"
   },
   "devDependencies": {
-    "mocha": "^11.7.1",  
+    "mocha": "^11.7.1",
     "should": "^13.2.3"
   },
   "engines": {
@@ -44,7 +44,7 @@
   },
   "contributors": [
     {
-      "name": "Charlie Wettlaufer", 
+      "name": "Charlie Wettlaufer",
       "email": "chartechnology@gmail.com",
       "note": "Original author of odoo-await"
     }
