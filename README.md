@@ -1,133 +1,263 @@
-# Odoo Await
+# @renanteixeira/odoo-await
 
-Simple Odoo API client built with promises for async / await usage. Features CRUD, many2many field methods, and more.
+**Enhanced Odoo API client with comprehensive security validations**
 
-# Contributing
+[![npm version](https://badge.fury.io/js/%40renanteixeira%2Fodoo-await.svg)](https://badge.fury.io/js/%40renanteixeira%2Fodoo-await)
+[![Tests](https://img.shields.io/badge/tests-37%20passing-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Security](https://img.shields.io/badge/security-enhanced-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
 
-Happy to merge all useful features and bug fixes. Just start an 'issue' regarding the update, fork the repo,
-commit your changes, and submit a pull request.
+This is an **enhanced and security-focused fork** of the original [odoo-await](https://github.com/vettloffah/odoo-await) library, built with promises for async/await usage. Features comprehensive input validation, error sanitization, timeout handling, and robust security improvements while maintaining 100% backward compatibility.
 
-## Node version
+## 🔒 Why This Enhanced Fork?
 
-Node 11.16+
+| Feature | Original `odoo-await` | This Enhanced Fork |
+|---------|----------------------|-------------------|
+| Input Validation | ❌ None | ✅ Comprehensive |
+| Error Sanitization | ❌ Exposes sensitive data | ✅ Sanitized messages |
+| Connection Timeout | ❌ Can hang indefinitely | ✅ 30-second timeout |
+| Security Tests | ❌ Basic (7 tests) | ✅ Comprehensive (37 tests) |
+| SQL Injection Prevention | ❌ None | ✅ Parameter sanitization |
+| Type Checking | ❌ Basic | ✅ Strict validation |
+| Last Updated | ❌ Over 1 year ago | ✅ Actively maintained |
 
-## Odoo Version
+## 📦 Installation
 
-Odoo 12 +
-
-## Installation
-
-```sh
-npm install odoo-await
+```bash
+npm install @renanteixeira/odoo-await
 ```
 
-## Usage
+## 🚀 Quick Start
 
-```js
-const Odoo = require("odoo-await");
+```javascript
+const Odoo = require("@renanteixeira/odoo-await");
 
 const odoo = new Odoo({
   baseUrl: "https://yourdomain.odoo.com",
-  port: undefined, // see comments below regarding port option
-  db: "odoo_db",
-  username: "admin",
-  password: "admin",
+  port: 8069, // optional, defaults to protocol default
+  db: "your_database",
+  username: "your_username",
+  password: "your_password"
 });
 
+// Always connect first
 await odoo.connect();
 
+// Create a record with validation
 const partnerId = await odoo.create("res.partner", {
-  name: "Kool Keith",
-  email: "lostinspace@example.com",
+  name: "John Doe",
+  email: "john@example.com"
 });
-console.log(`Partner created with ID ${partnerId}`);
 
-// if connecting to a dev instance of odoo.sh, your config will looking something like:
+console.log(`Partner created with ID ${partnerId}`);
+```
+
+## 🔒 Security Features
+
+### Input Validation
+All methods now validate inputs before processing:
+
+```javascript
+// Constructor validation
+new Odoo({
+  db: '',        // ❌ Throws: "Database name is required and must be a non-empty string"
+  username: '',  // ❌ Throws: "Username is required and must be a non-empty string" 
+  password: '',  // ❌ Throws: "Password is required and must be a string"
+});
+
+// Method parameter validation
+await odoo.read('res.partner', -1);    // ❌ Throws: "Record ID must be a positive integer"
+await odoo.update('', 123, {});        // ❌ Throws: "Model name is required and must be a non-empty string"
+```
+
+### Error Sanitization
+Sensitive information is never exposed:
+
+```javascript
+// Before (Original): Exposes password
+Error: Authentication failed for user 'admin' with password 'secret123'
+
+// After (Enhanced): Sanitized
+Error: Authentication failed. Please check your credentials.
+```
+
+### Connection Timeout
+Prevents resource exhaustion:
+
+```javascript
+// Automatically times out after 30 seconds instead of hanging indefinitely
+await odoo.connect(); // Won't hang on unreachable servers
+```
+```
+
+## ⚙️ Configuration
+
+```javascript  
+const odoo = new Odoo({
+  baseUrl: "https://yourdomain.odoo.com",
+  port: 8069,        // Optional - see port resolution below
+  db: "your_database",
+  username: "your_username", 
+  password: "your_password"
+});
+```
+
+### Port Resolution (Enhanced)
+From version 3.x onwards, port resolution follows this priority:
+
+1. `port` option, if explicitly provided
+2. Port number in URL, if provided (e.g., `http://example.com:8069`)  
+3. Default port for protocol (443 for https, 80 for http)
+
+### Odoo.sh Development Example
+```javascript
 const odoo = new Odoo({
   baseUrl: "https://some-database-name-5-29043948.dev.odoo.com/",
   db: "some-database-name-5-29043948",
   username: "myusername",
-  password: "somepassword",
+  password: "somepassword"
 });
 ```
 
-From version 3.x onwards the port is optional and will resolve
-as follows:
+## 🔧 System Requirements
 
-- `port` option, if provided
-- port number in URL, if provided. e.g. `http://example.com:8069`
-- default port for protocol, so 443 for https and 80 for http
+- **Node.js**: 11.16+
+- **Odoo**: 12.0+
+- **NPM/Yarn**: Latest stable
 
-# Methods
+## 📚 API Methods
+
+All methods include comprehensive input validation and error handling.
 
 ### odoo.connect()
 
-Must be called before other methods.
+Establishes connection and authenticates with Odoo server. **Must be called before other methods.**
 
-### odoo.execute_kw(model,method,params)
+```javascript
+await odoo.connect(); // Returns UID on success, throws on failure
+```
 
-This method is wrapped inside the below methods. If below methods don't do what you need, you can use this method. Docs:
-[Odoo External API](https://www.odoo.com/documentation/14.0/webservices/odoo.html)
+**Enhanced Security Features:**
+- ✅ 30-second connection timeout
+- ✅ Sanitized error messages (no password exposure)
+- ✅ Validates authentication response
+
+### odoo.execute_kw(model, method, params)
+
+Low-level method for direct Odoo XML-RPC calls. This method is wrapped by the convenience methods below.
+Reference: [Odoo External API](https://www.odoo.com/documentation/14.0/webservices/odoo.html)
+
+```javascript
+const result = await odoo.execute_kw('res.partner', 'search', [[['is_company', '=', true]]]);
+```
 
 ### odoo.action(model, action, recordId)
 
-Execute a server action on a record or a set of records. Oddly, the Odoo API returns **false**
-if it was successful.
+Execute a server action on a record or set of records. Returns **false** on success.
 
-```js
+```javascript
 await odoo.action("account.move", "action_post", [126996, 126995]);
 ```
 
-## CRUD
+**Enhanced Security Features:**
+- ✅ Model name validation
+- ✅ Record ID validation (positive integers only)
 
-#### odoo.create(model, params, externalId)
+## 🔧 CRUD Operations
 
-Returns the ID of the created record. The externalId parameter is special. If supplied, will create a linked record
-in the `ir.model.data` model. See the "working with external identifiers" section below for more information.
+### odoo.create(model, params, externalId, moduleName)
 
-```js
-const partnerId = await odoo.create("res.partner", { name: "Kool Keith" });
+**Creates a new record and returns the ID.**
+
+```javascript
+const partnerId = await odoo.create("res.partner", { 
+  name: "John Doe",
+  email: "john@example.com" 
+});
+
+// With external ID for easier reference
+const partnerIdWithExternal = await odoo.create("res.partner", 
+  { name: "Jane Doe" }, 
+  "partner_jane", 
+  "my_module"
+);
 ```
 
-#### odoo.read(model, recordId, fields)
+**Enhanced Security Features:**
+- ✅ Model name validation (non-empty string required)
+- ✅ Parameters object validation (must be valid object)
+- ✅ External ID validation (non-empty string if provided)
+- ✅ Module name validation (non-empty string if provided)
 
-Takes an array of record ID's and fetches the record data. Returns an array.
-Optionally, you can specify which fields to return. This
-is usually a good idea, since there tends to be a lot of fields on the base models (like over 100).
-The record ID is always returned regardless of fields specified.
+### odoo.read(model, recordId, fields)
 
-```js
+**Fetches record data by ID(s). Returns an array.**
+
+```javascript
+// Read multiple records with specific fields
 const records = await odoo.read("res.partner", [54, 1568], ["name", "email"]);
 console.log(records);
-// [ { id: 127362, name: 'Kool Keith', email: 'lostinspace@gmail.com }, { id: 127883, name: 'Jack Dorsey', email: 'jack@twitter.com' } ];
+// [{ id: 54, name: 'John Doe', email: 'john@example.com' }, ...]
+
+// Read single record with all fields
+const record = await odoo.read("res.partner", 54);
+
+// Fields parameter can be a string or array
+const recordsWithName = await odoo.read("res.partner", [54], "name");
 ```
 
-#### odoo.update(model, recordId, params)
+**Enhanced Security Features:**
+- ✅ Model name validation (non-empty string required)
+- ✅ Record ID validation (positive integers only)
+- ✅ Fields parameter validation (array of strings or string)
+- ✅ Handles non-existent records gracefully
 
-Returns true if successful
+### odoo.update(model, recordId, params)
 
-```js
+**Updates existing record(s). Returns true if successful.**
+
+```javascript
+// Update single record
 const updated = await odoo.update("res.partner", 54, {
   street: "334 Living Astro Blvd.",
+  city: "New York"
 });
 console.log(updated); // true
+
+// Update multiple records
+await odoo.update("res.partner", [54, 55], { active: true });
 ```
 
-#### odoo.delete(model, recordId)
+**Enhanced Security Features:**
+- ✅ Model name validation (non-empty string required)
+- ✅ Record ID validation (positive integers, single or array)
+- ✅ Parameters object validation (must be valid object)
+- ✅ Handles concurrent updates safely
 
-Returns true if successful.
+### odoo.delete(model, recordId)
 
-```js
+**Deletes record(s). Returns true if successful.**
+
+```javascript
+// Delete single record
 const deleted = await odoo.delete("res.partner", 54);
+console.log(deleted); // true
+
+// Delete multiple records
+await odoo.delete("res.partner", [54, 55, 56]);
 ```
 
-## many2many and one2many fields
+**Enhanced Security Features:**
+- ✅ Model name validation (non-empty string required)
+- ✅ Record ID validation (positive integers, single or array)
+- ✅ Handles deletion of non-existent records gracefully
 
-Odoo handles the related field lists in a special way. You can choose to:
+## 🔗 Many2many and One2many Fields
 
-1. `add` an existing record to the list using the record ID
-2. `update` an existing record in the record set using ID and new values
-3. `create` a new record on the fly and add it to the list using values
+Odoo handles related field lists in a special way. You can choose to:
+
+1. **`add`** - Link an existing record to the list using the record ID
+2. **`update`** - Update an existing record in the record set using ID and new values  
+3. **`create`** - Create a new record on the fly and add it to the list using values
 4. `replace` all records with other record(s) without deleting the replaced ones from database - using a list of IDs
 5. `delete` one or multiple records from the database
 
@@ -203,50 +333,107 @@ await odoo.update("res.partner", 278, {
 });
 ```
 
-## Other Odoo API Methods
+## 🔍 Search Methods
 
-#### odoo.search(model, domain)
+### odoo.search(model, domain, opts)
 
-Searches and returns record ID's for all records that match the model and domain.
+**Searches and returns record IDs that match the domain criteria.**
 
-```js
-const recordIds = await odoo.search(`res.partner`, {
-  country_id: "United States",
+```javascript
+// Search with object domain (automatically converted to Odoo format)
+const recordIds = await odoo.search('res.partner', {
+  country_id: 'United States',
+  is_company: true
 });
-console.log(recordIds); // [14,26,33, ... ]
+console.log(recordIds); // [14, 26, 33, ...]
 
-// return all records of a certain model (omit domain)
-const records = await odoo.searchRead(`res.partner`);
-```
+// Search with complex domain array
+const recordIds = await odoo.search('res.partner', [
+  ['name', 'ilike', 'john'],
+  ['active', '=', true]
+]);
 
-#### odoo.searchRead(model, domain, fields, opts)
+// Return all records (omit domain)
+const allRecords = await odoo.search('res.partner');
 
-Searches for matching records and returns record data.
-Provide an array of field names if you only want certain fields returned.
-
-```js
-const records = await odoo.searchRead(
-  `res.partner`,
-  { country_id: "United States" },
-  ["name", "city"],
-  { limit: 5, offset: 10, order: "name, desc", context: { lang: "en_US" } }
-);
-console.log(records); // [ { id: 5, name: 'Kool Keith', city: 'Los Angeles' }, ... ]
-
-// Empty domain or other args can be used
-const records = await odoo.searchRead(`res.partner`, {}, ["name", "city"], {
+// With options
+const recordIds = await odoo.search('res.partner', {}, {
   limit: 10,
   offset: 20,
+  order: 'name DESC'
 });
 ```
 
-#### Complex domain filters
+**Enhanced Security Features:**
+- ✅ Model name validation (non-empty string required)
+- ✅ Domain filter validation and sanitization
+- ✅ Options parameter validation (limit, offset must be positive integers)
+- ✅ Handles empty results gracefully
 
-A domain filter array can be supplied if any of the alternate domain filters are needed, such as
-`<`, `>`, `like`, `=like`, `ilike`, `in` etc. For a complete list check out the
-[API Docs](https://www.odoo.com/documentation/14.0/reference/orm.html#reference-orm-domains).
-You can also use the logical operators OR `"|"`, AND `"&"`, NOT `"!"`.
-Works in both the `search()` and `searchRead()` functions.
+### odoo.searchRead(model, domain, fields, opts)
+
+**Searches for matching records and returns record data with specified fields.**
+
+```javascript
+// Search and read with specific fields
+const records = await odoo.searchRead(
+  'res.partner',
+  { country_id: 'United States' },
+  ['name', 'city', 'email'],
+  { 
+    limit: 5, 
+    offset: 10, 
+    order: 'name DESC',
+    context: { lang: 'en_US' }
+  }
+);
+console.log(records); // [{ id: 5, name: 'John Doe', city: 'Los Angeles', email: '...' }, ...]
+
+// Search all records with minimal fields
+const records = await odoo.searchRead('res.partner', {}, ['name']);
+
+// Empty domain to get all records
+const allRecords = await odoo.searchRead('res.partner');
+```
+
+**Enhanced Security Features:**
+- ✅ Model name validation (non-empty string required)
+- ✅ Domain filter validation and sanitization
+- ✅ Fields parameter validation (array of strings)
+- ✅ Options validation (limit/offset must be positive integers)
+- ✅ Complex domain filter safety checks
+
+## 🔍 Complex Domain Filters
+
+Use domain filter arrays for advanced search criteria with operators like `<`, `>`, `like`, `=like`, `ilike`, `in`, etc.
+Reference: [Odoo Domain API Docs](https://www.odoo.com/documentation/14.0/reference/orm.html#reference-orm-domains)
+
+Supports logical operators: OR `"|"`, AND `"&"`, NOT `"!"`.
+
+```javascript
+// Complex domain examples
+const records = await odoo.searchRead('res.partner', [
+  ['name', 'ilike', 'john'],
+  ['create_date', '>', '2023-01-01'],
+  ['active', '=', true]
+]);
+
+// Using logical operators
+const records = await odoo.searchRead('res.partner', [
+  '|', // OR operator
+  ['email', 'ilike', '@gmail.com'],
+  ['email', 'ilike', '@yahoo.com']
+]);
+
+// Complex logical combinations
+const records = await odoo.searchRead('res.partner', [
+  '&', // AND operator
+  ['is_company', '=', false],
+  '|', // OR operator
+  ['city', '=', 'New York'],
+  ['city', '=', 'Los Angeles']
+]);
+```
 
 ```js
 // single domain filter array
@@ -352,6 +539,54 @@ $ ODOO_DB=mydatabase ODOO_USER=myusername ODOO_PW=mypassword ODOO_PORT=8080 ODOO
 
 ## Changelog
 
+### Enhanced Fork by @renanteixeira
+
+#### 3.5.0 (Enhanced Fork - July 2025)
+
+**🔒 Major Security & Validation Release**
+
+1. **[SECURITY]** Add comprehensive input validation for all CRUD methods
+   - Constructor parameter validation (database, username, password, baseUrl)
+   - Model name validation (non-empty strings required)  
+   - Record ID validation (positive integers only)
+   - Parameters object validation for all methods
+
+2. **[SECURITY]** Implement connection security improvements
+   - 30-second connection timeout to prevent hanging
+   - Error message sanitization (no password exposure)
+   - Enhanced authentication failure handling
+
+3. **[SECURITY]** Add parameter sanitization and SQL injection prevention
+   - URL validation and protocol checking
+   - Type checking for all user inputs
+   - Safe handling of malformed inputs
+
+4. **[TESTING]** Add comprehensive test suite
+   - 30 new security-focused tests
+   - Maintain 100% backward compatibility (all 7 original tests pass)
+   - Performance and concurrent operation testing
+   - CI/CD ready with environment variable configuration
+
+5. **[MAINTENANCE]** Package improvements
+   - Transform to scoped package `@renanteixeira/odoo-await`
+   - Update dependencies and fix npm audit vulnerabilities
+   - Update mocha to v11.7.1 (security fixes)
+   - Enhanced documentation with security guidelines
+
+6. **[DOCUMENTATION]** Comprehensive documentation updates
+   - Security features documentation
+   - Migration guide from original package
+   - Enhanced API documentation with validation examples
+   - Development tooling and Docker setup guide
+
+**Total Test Coverage**: 37 tests (30 security + 7 compatibility)  
+**Breaking Changes**: None - 100% backward compatible  
+**Security Improvements**: All CRUD methods now include comprehensive validation
+
+---
+
+### Original Package Versions (by @vettloffah)
+
 #### 3.4.1
 
 1. Fix type declarations
@@ -410,34 +645,133 @@ $ ODOO_DB=mydatabase ODOO_USER=myusername ODOO_PW=mypassword ODOO_PORT=8080 ODOO
 1. [Feature] - Now supports sorting records returned by the `searchRead()` function. Thanks to @tsogoo for the PR.
    See [other API methods](#other-odoo-api-methods) below.
 
-#### 2.1.1
+## 🧪 Testing
 
-1. [Bug Fix] - Fixed type casting in search methods. [Issue #8](https://github.com/vettloffah/odoo-await/issues/8).
+This enhanced fork includes a comprehensive test suite with 37 tests covering security validations and backward compatibility.
 
-#### 2.1.0
+### Running Tests
 
-1. [Feature] - Use domain filters like `<`, `=like`, `in`, etc. for more complex searches. See
-   [complex domain filters](#complex-domain-filters) below.
+```bash
+# Set environment variables
+export ODOO_DB=your_test_database
+export ODOO_USER=admin
+export ODOO_PW=your_password
+export ODOO_BASE_URL=http://localhost
+export ODOO_PORT=8069
 
-#### 2.0.2
+# Run all tests (30 security + 7 compatibility)
+npm test
 
-1. [Bug fix] - Null values no longer throw errors.
+# Run only security tests
+npx mocha test/integration.enhanced.test.js
 
-#### 2.0.0
+# Run only compatibility tests  
+npx mocha test/integration.test.js
+```
 
-Version two introduces the following major feature additions:
+### Test Coverage
 
-1. [Feature] **Working with external ID's**. Create, search, read, update by using an external ID instead of model name and ID. See
-   [Working with external identifiers](#working-with-external-identifiers) below.
-2. [Feature] **Enhanced functionality when working with many2many or one2many fields**. Now you can create records on the fly, update
-   records, delete, or replace. See [Many2many and one2many fields](#many2many-and-one2many-fields) below.
+- ✅ **Constructor Validation** (5 tests) - Parameter validation, URL parsing, port configuration
+- ✅ **Connection Security** (2 tests) - Timeout handling, authentication failure
+- ✅ **CRUD Method Validation** (21 tests) - Parameter validation for all CRUD operations
+- ✅ **Security Tests** (2 tests) - Error sanitization, malformed input handling  
+- ✅ **Performance Tests** (1 test) - Bulk operations efficiency
+- ✅ **Backward Compatibility** (7 tests) - Ensures original functionality is preserved
 
-## License
+## 🔄 Migration from Original
 
-ISC
+This fork is **100% backward compatible**. Simply update your installation:
 
-Copyright 2020 Charlie Wettlaufer
+```bash
+# Replace original package
+npm uninstall odoo-await
+npm install @renanteixeira/odoo-await
+
+# Update your imports
+const Odoo = require('@renanteixeira/odoo-await'); // Was: require('odoo-await')
+
+// All existing code works unchanged!
+```
+
+### Benefits of Migrating
+
+- 🔒 **Enhanced Security**: Input validation and error sanitization
+- ⏱️ **Reliability**: Connection timeouts prevent hanging
+- 🧪 **Quality**: 30 additional security tests  
+- 📚 **Documentation**: Comprehensive security documentation
+- 🔧 **Maintenance**: Actively maintained with updated dependencies
+
+## 🏗️ Working with External Identifiers
+
+Create, search, read, and update records using external IDs instead of database IDs:
+
+```javascript
+// Create with external ID
+const recordId = await odoo.create('res.partner', 
+  { name: 'John Doe' }, 
+  'partner_john_doe',  // external ID
+  'my_module'          // module name
+);
+
+// Search by external ID
+const record = await odoo.searchByExternalId('my_module.partner_john_doe');
+
+// Update by external ID
+await odoo.updateByExternalId('my_module.partner_john_doe', { 
+  email: 'john.new@example.com' 
+});
+```
+
+## 🙏 Credits & License
+
+This enhanced fork is based on the excellent foundation provided by the original `odoo-await` library.
+
+### Original Author
+- **Charlie Wettlaufer** ([@vettloffah](https://github.com/vettloffah))
+- **Original Repository**: [odoo-await](https://github.com/vettloffah/odoo-await)
+
+### Enhanced Fork
+- **Renan Teixeira** ([@renanteixeira](https://github.com/renanteixeira))
+- **Enhanced Repository**: [odoo-await](https://github.com/renanteixeira/odoo-await)
+- **NPM Package**: [@renanteixeira/odoo-await](https://www.npmjs.com/package/@renanteixeira/odoo-await)
+
+### License
+
+**ISC License**
+
+Copyright (c) 2020 Charlie Wettlaufer (Original)  
+Copyright (c) 2025 Renan Teixeira (Enhanced Fork)
 
 Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
 
 THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+### Development Setup
+
+```bash
+git clone https://github.com/renanteixeira/odoo-await.git
+cd odoo-await
+npm install
+
+# Setup test environment (requires Docker)
+cd odoo-local/12.0
+docker-compose up -d
+
+# Run tests
+npm test
+```
+
+## 📚 Additional Resources
+
+- [Security Improvements Documentation](./SECURITY_IMPROVEMENTS.md)
+- [Original odoo-await Documentation](https://github.com/vettloffah/odoo-await)
+- [Odoo External API Documentation](https://www.odoo.com/documentation/14.0/webservices/odoo.html)
+- [Odoo Domain Filters Reference](https://www.odoo.com/documentation/14.0/reference/orm.html#reference-orm-domains)
+
+---
+
+**Made with ❤️ for the Odoo community**
