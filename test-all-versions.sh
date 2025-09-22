@@ -8,8 +8,8 @@ set -e
 echo "🧪 Testing odoo-await compatibility with all versions..."
 
 # Arrays with versions and their corresponding ports
-versions=(12 13 14 15 16 17 18)
-ports=(12069 13069 14069 15069 16069 17069 18069)
+versions=(12 13 14 15 16 17 18 19)
+ports=(12069 13069 14069 15069 16069 17069 18069 19069)
 
 # Colors for output
 RED='\033[0;31m'

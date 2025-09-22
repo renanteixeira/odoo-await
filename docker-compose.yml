@@ -146,6 +146,23 @@ services:
       - odoo18_data:/var/lib/odoo
     command: odoo --database=odoo18 --db_user=odoo --db_password=odoo --db_host=postgres
 
+  # Odoo 19.0
+  odoo19:
+    image: odoo:19.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - HOST=postgres
+      - USER=odoo
+      - PASSWORD=odoo
+    ports:
+      - "19069:8069"
+      - "19072:8072"
+    volumes:
+      - odoo19_data:/var/lib/odoo
+    command: odoo --database=odoo19 --db_user=odoo --db_password=odoo --db_host=postgres
+
 volumes:
   postgres_data:
   odoo12_data:
@@ -155,3 +172,4 @@ volumes:
   odoo16_data:
   odoo17_data:
   odoo18_data:
+  odoo19_data:

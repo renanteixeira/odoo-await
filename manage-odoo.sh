@@ -43,6 +43,7 @@ show_urls() {
     echo "   Odoo 16.0: http://localhost:16069"
     echo "   Odoo 17.0: http://localhost:17069"
     echo "   Odoo 18.0: http://localhost:18069"
+    echo "   Odoo 19.0: http://localhost:19069"
     echo ""
     echo "🔐 Credentials: admin/admin"
     echo "💾 PostgreSQL: localhost:5432 (postgres/postgres)"

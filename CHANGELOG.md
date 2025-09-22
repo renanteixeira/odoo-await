@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0] - 2025-09-22
+
+### 🚀 Added
+- **Odoo 19.0 Support**: Full compatibility with Odoo 19.0, including Docker environment and comprehensive testing
+- **Updated Multi-Version Environment**: Extended Docker setup now supports Odoo versions 12.0 through 19.0
+- **Documentation Updates**: Updated README, multi-version guide, and management scripts for Odoo 19.0
+
+### ✅ Verified
+- All existing tests pass on Odoo 19.0
+- XML-RPC API compatibility confirmed (JSON-2 API is new but XML-RPC remains functional)
+- No breaking changes required for Odoo 19.0 compatibility
+
 ## [3.6.0] - 2025-07-25
 
 ### 🚀 Major Feature Release: Multi-Version Environment

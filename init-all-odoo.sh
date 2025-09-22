@@ -34,7 +34,7 @@ docker compose exec postgres psql -U postgres -c "SELECT 1 FROM pg_roles WHERE r
 }
 
 # Inicializar bancos de dados para cada versão do Odoo
-versions=(12 13 14 15 16 17 18)
+versions=(12 13 14 15 16 17 18 19)
 
 for version in "${versions[@]}"; do
     echo "🔧 Initializing Odoo ${version}.0..."
@@ -75,6 +75,7 @@ echo "   Odoo 15.0: http://localhost:15069"
 echo "   Odoo 16.0: http://localhost:16069"
 echo "   Odoo 17.0: http://localhost:17069"
 echo "   Odoo 18.0: http://localhost:18069"
+echo "   Odoo 19.0: http://localhost:19069"
 echo ""
 echo "🔐 Default credentials: admin/admin"
 echo "💾 PostgreSQL: localhost:5432 (odoo/odoo)"

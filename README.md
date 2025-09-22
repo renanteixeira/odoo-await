@@ -12,10 +12,11 @@
 [![Odoo 16.0](https://img.shields.io/badge/Odoo-16.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
 [![Odoo 17.0](https://img.shields.io/badge/Odoo-17.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
 [![Odoo 18.0](https://img.shields.io/badge/Odoo-18.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
+[![Odoo 19.0](https://img.shields.io/badge/Odoo-19.0-brightgreen.svg)](https://github.com/renanteixeira/odoo-await)
 
 This is an **enhanced and security-focused fork** of the original [odoo-await](https://github.com/vettloffah/odoo-await) library, built with promises for async/await usage. Features comprehensive input validation, error sanitization, timeout handling, and robust security improvements while maintaining 100% backward compatibility.
 
-**✨ NEW: Multi-Version Docker Environment** - Test your code against Odoo versions 12.0 through 18.0 simultaneously! See [Multi-Version Setup Guide](./MULTI_VERSION_README.md).
+**✨ NEW: Multi-Version Docker Environment** - Test your code against Odoo versions 12.0 through 19.0 simultaneously! See [Multi-Version Setup Guide](./MULTI_VERSION_README.md).
 
 ## 🔒 Why This Enhanced Fork?
 
@@ -27,7 +28,7 @@ This is an **enhanced and security-focused fork** of the original [odoo-await](h
 | Security Tests | ❌ Basic (7 tests) | ✅ Comprehensive (37 tests) |
 | SQL Injection Prevention | ❌ None | ✅ Parameter sanitization |
 | Type Checking | ❌ Basic | ✅ Strict validation |
-| Odoo Version Support | ❌ Single version testing | ✅ Multi-version (12.0-18.0) |
+| Odoo Version Support | ❌ Single version testing | ✅ Multi-version (12.0-19.0) |
 | Docker Environment | ❌ Basic setup | ✅ Multi-version testing environment |
 | Last Updated | ❌ Over 1 year ago | ✅ Actively maintained |
 

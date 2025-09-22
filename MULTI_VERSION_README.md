@@ -1,6 +1,6 @@
 # 🐳 Ambiente Odoo Multi-Versão
 
-Este ambiente Docker permite executar simultaneamente todas as versões do Odoo (12, 13, 14, 15, 16, 17, 18) para testes de compatibilidade da biblioteca `odoo-await`.
+Este ambiente Docker permite executar simultaneamente todas as versões do Odoo (12, 13, 14, 15, 16, 17, 18, 19) para testes de compatibilidade da biblioteca `odoo-await`.
 
 ## 🚀 Início Rápido
 
@@ -43,6 +43,7 @@ Este ambiente Docker permite executar simultaneamente todas as versões do Odoo 
 | Odoo 16.0 | http://localhost:16069 | ws://localhost:16072 |
 | Odoo 17.0 | http://localhost:17069 | ws://localhost:17072 |
 | Odoo 18.0 | http://localhost:18069 | ws://localhost:18072 |
+| Odoo 19.0 | http://localhost:19069 | ws://localhost:19072 |
 
 **Credenciais padrão:** `admin/admin`
 
