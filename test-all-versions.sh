@@ -21,9 +21,12 @@ passed=0
 failed=0
 
 # Loop through all versions
+echo "Starting loop with ${#versions[@]} versions: ${versions[*]}"
 for i in "${!versions[@]}"; do
     version=${versions[$i]}
     port=${ports[$i]}
+    
+    echo "Processing version $i: Odoo ${version}.0 on port ${port}"
     
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -32,10 +35,10 @@ for i in "${!versions[@]}"; do
     
     # Wait for service to be ready
     echo "⏳ Waiting for Odoo ${version}.0 to be ready..."
-    if timeout 120 bash -c "until curl -s http://localhost:${port} > /dev/null; do sleep 2; done"; then
+    if timeout 180 bash -c "until curl -s http://localhost:${port} > /dev/null; do sleep 2; done"; then
         echo "✅ Odoo ${version}.0 is ready!"
     else
-        echo -e "${RED}❌ Odoo ${version}.0 did not respond in 120 seconds${NC}"
+        echo -e "${RED}❌ Odoo ${version}.0 did not respond in 180 seconds${NC}"
         ((failed++))
         continue
     fi
@@ -47,6 +50,8 @@ for i in "${!versions[@]}"; do
     export ODOO_PW="admin"
     export ODOO_BASE_URL="http://localhost:${port}"
     
+    echo "Environment variables set: ODOO_DB=$ODOO_DB, ODOO_BASE_URL=$ODOO_BASE_URL"
+    
     if npm test --silent; then
         echo -e "${GREEN}✅ Odoo ${version}.0 - PASSED all tests!${NC}"
         ((passed++))
@@ -55,9 +60,15 @@ for i in "${!versions[@]}"; do
         ((failed++))
     fi
     
+    echo "After test: passed=$passed, failed=$failed"
+    
     # Clear environment variables
     unset ODOO_DB ODOO_USER ODOO_PW ODOO_BASE_URL
+    
+    echo "Completed processing version $version, moving to next..."
 done
+
+echo "Loop completed. Final counts: passed=$passed, failed=$failed"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
