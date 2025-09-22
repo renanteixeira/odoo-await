@@ -20,38 +20,50 @@ NC='\033[0m' # No Color
 passed=0
 failed=0
 
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+    echo -e "${RED}❌ Docker is not running. Please start Docker and try again.${NC}"
+    exit 1
+fi
+
+# Start all Odoo services
+echo "🐳 Starting all Odoo services..."
+docker-compose up -d
+
+# Wait a bit for services to initialize
+echo "⏳ Waiting for Docker services to initialize..."
+sleep 10
+
 # Loop through all versions
 echo "Starting loop with ${#versions[@]} versions: ${versions[*]}"
 for i in "${!versions[@]}"; do
     version=${versions[$i]}
     port=${ports[$i]}
-    
-    echo "Processing version $i: Odoo ${version}.0 on port ${port}"
-    
+
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo -e "${YELLOW}🔍 Testing Odoo ${version}.0 (port ${port})...${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
+
     # Wait for service to be ready
     echo "⏳ Waiting for Odoo ${version}.0 to be ready..."
-    if timeout 180 bash -c "until curl -s http://localhost:${port} > /dev/null; do sleep 2; done"; then
+    if timeout 300 bash -c "until curl -s http://localhost:${port} > /dev/null; do sleep 5; done"; then
         echo "✅ Odoo ${version}.0 is ready!"
     else
-        echo -e "${RED}❌ Odoo ${version}.0 did not respond in 180 seconds${NC}"
+        echo -e "${RED}❌ Odoo ${version}.0 did not respond in 300 seconds${NC}"
         ((failed++))
         continue
     fi
-    
+
     # Run tests specific to this version
     echo "🧪 Running tests..."
     export ODOO_DB="odoo${version}"
     export ODOO_USER="admin"
     export ODOO_PW="admin"
     export ODOO_BASE_URL="http://localhost:${port}"
-    
+
     echo "Environment variables set: ODOO_DB=$ODOO_DB, ODOO_BASE_URL=$ODOO_BASE_URL"
-    
+
     if npm test --silent; then
         echo -e "${GREEN}✅ Odoo ${version}.0 - PASSED all tests!${NC}"
         ((passed++))
@@ -59,17 +71,23 @@ for i in "${!versions[@]}"; do
         echo -e "${RED}❌ Odoo ${version}.0 - FAILED tests!${NC}"
         ((failed++))
     fi
-    
+
     echo "After test: passed=$passed, failed=$failed"
-    
+
     # Clear environment variables
     unset ODOO_DB ODOO_USER ODOO_PW ODOO_BASE_URL
-    
+
     echo "Completed processing version $version, moving to next..."
 done
 
 echo "Loop completed. Final counts: passed=$passed, failed=$failed"
 
+# Clean up
+echo ""
+echo "🧹 Cleaning up Docker services..."
+docker-compose down
+
+# Summary
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📊 TEST SUMMARY"
