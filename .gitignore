@@ -5,3 +5,4 @@ node_modules
 odoo-docs/
 .github/copilot-instructions.md
 AGENT_*.md
+logs_*/

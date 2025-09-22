@@ -32,10 +32,10 @@ for i in "${!versions[@]}"; do
     
     # Wait for service to be ready
     echo "⏳ Waiting for Odoo ${version}.0 to be ready..."
-    if timeout 60 bash -c "until curl -s http://localhost:${port} > /dev/null; do sleep 2; done"; then
+    if timeout 120 bash -c "until curl -s http://localhost:${port} > /dev/null; do sleep 2; done"; then
         echo "✅ Odoo ${version}.0 is ready!"
     else
-        echo -e "${RED}❌ Odoo ${version}.0 did not respond in 60 seconds${NC}"
+        echo -e "${RED}❌ Odoo ${version}.0 did not respond in 120 seconds${NC}"
         ((failed++))
         continue
     fi

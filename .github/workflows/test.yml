@@ -61,6 +61,7 @@ jobs:
 
   test-all-versions:
     runs-on: ubuntu-latest
+    needs: test-multi-version
 
     steps:
     - uses: actions/checkout@v4
@@ -79,7 +80,14 @@ jobs:
         chmod +x ./manage-odoo.sh
         chmod +x ./init-all-odoo.sh
         chmod +x ./test-all-versions.sh
-        ./manage-odoo.sh init
+        
+        # Check if services are already running (from previous jobs)
+        if docker compose ps | grep -q "odoo"; then
+          echo "Services already running, skipping initialization..."
+        else
+          echo "Initializing multi-version environment..."
+          ./manage-odoo.sh init
+        fi
 
     - name: Wait for all services to be ready
       run: |
@@ -87,10 +95,12 @@ jobs:
         for version in 12 13 14 15 16 17 18 19; do
           port=$((${version}069))
           echo "Waiting for Odoo ${version}.0 on port $port..."
-          timeout 120 bash -c "until curl -s http://localhost:$port > /dev/null; do sleep 3; done" || {
-            echo "Warning: Odoo ${version}.0 may not be ready yet"
+          timeout 180 bash -c "until curl -s http://localhost:$port > /dev/null; do sleep 5; done" || {
+            echo "Error: Odoo ${version}.0 failed to respond on port $port"
+            exit 1
           }
         done
+        echo "All Odoo services are ready!"
 
     - name: Run comprehensive test suite
       run: |
