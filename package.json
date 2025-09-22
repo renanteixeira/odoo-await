@@ -1,6 +1,6 @@
 {
   "name": "@renanteixeira/odoo-await",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "description": "Enhanced Odoo API client with comprehensive security validations - Fork of odoo-await",
   "main": "lib/index.js",
   "directories": {
