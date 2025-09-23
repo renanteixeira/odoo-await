@@ -63,6 +63,133 @@ const partnerId = await odoo.create("res.partner", {
 console.log(`Partner created with ID ${partnerId}`);
 ```
 
+## 🌐 Frontend Usage (ESM)
+
+This library supports ES modules for modern Node.js environments and server-side rendering frameworks. **Important**: This library is designed for backend/Node.js environments only and cannot run in browsers due to XML-RPC protocol requirements.
+
+### ✅ Supported Environments
+
+- **Node.js with ESM**: Modern Node.js applications using ES modules
+- **Server-Side Rendering (SSR)**: Next.js API routes, Nuxt.js server middleware, etc.
+- **Build Tools**: Bundlers that process code server-side (Webpack, Vite in SSR mode, etc.)
+- **Backend Frameworks**: Express, Fastify, Koa with ESM support
+
+### ❌ Not Supported
+
+- **Browser environments**: Direct browser usage (throws error)
+- **Client-side React/Vue components**: Cannot make direct XML-RPC calls from browser
+
+### Next.js API Route Example
+
+```javascript
+// pages/api/odoo/partners.js
+import OdooAwait from '@renanteixeira/odoo-await';
+
+export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const odoo = new OdooAwait({
+      baseUrl: process.env.ODOO_BASE_URL,
+      db: process.env.ODOO_DB,
+      username: process.env.ODOO_USER,
+      password: process.env.ODOO_PW
+    });
+
+    await odoo.connect();
+    const partners = await odoo.searchRead('res.partner', {}, ['name', 'email']);
+
+    res.status(200).json({ partners });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+```
+
+### React Component (Server-Side)
+
+```javascript
+// components/PartnersList.js (used in SSR/getServerSideProps)
+import OdooAwait from '@renanteixeira/odoo-await';
+
+export async function getServerSideProps() {
+  const odoo = new OdooAwait({
+    baseUrl: process.env.ODOO_BASE_URL,
+    db: process.env.ODOO_DB,
+    username: process.env.ODOO_USER,
+    password: process.env.ODOO_PW
+  });
+
+  await odoo.connect();
+  const partners = await odoo.searchRead('res.partner', {}, ['name', 'email']);
+
+  return {
+    props: { partners }
+  };
+}
+
+export default function PartnersList({ partners }) {
+  return (
+    <div>
+      {partners.map(partner => (
+        <div key={partner.id}>
+          {partner.name} - {partner.email}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### Express.js with ESM
+
+```javascript
+// server.mjs
+import express from 'express';
+import OdooAwait from '@renanteixeira/odoo-await';
+
+const app = express();
+const odoo = new OdooAwait({
+  baseUrl: process.env.ODOO_BASE_URL,
+  db: process.env.ODOO_DB,
+  username: process.env.ODOO_USER,
+  password: process.env.ODOO_PW
+});
+
+app.get('/api/partners', async (req, res) => {
+  try {
+    await odoo.connect();
+    const partners = await odoo.searchRead('res.partner', {}, ['name', 'email']);
+    res.json({ partners });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));
+```
+
+### Nuxt.js Server Middleware
+
+```javascript
+// server/api/partners.get.js
+import OdooAwait from '@renanteixeira/odoo-await';
+
+const odoo = new OdooAwait({
+  baseUrl: process.env.ODOO_BASE_URL,
+  db: process.env.ODOO_DB,
+  username: process.env.ODOO_USER,
+  password: process.env.ODOO_PW
+});
+
+export default defineEventHandler(async (event) => {
+  await odoo.connect();
+  return await odoo.searchRead('res.partner', {}, ['name', 'email']);
+});
+```
+
 ## 🔒 Security Features
 
 ### Input Validation

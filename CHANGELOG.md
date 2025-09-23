@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.8.0] - 2025-09-22
+
+### 🚀 Added
+- **ESM Support**: Full ES modules support for modern Node.js environments and server-side rendering
+- **Conditional Exports**: Added `exports` field in package.json for dual CommonJS/ESM compatibility
+- **Module Field**: Added `module` field pointing to `lib/index.mjs` for bundler optimization
+- **Browser Detection**: Added runtime check to prevent browser usage with clear error message
+
+### ✅ Verified
+- **Backend Compatibility**: All existing CommonJS usage remains unchanged
+- **ESM Functionality**: Tested with Node.js ESM and server-side bundlers
+- **No Breaking Changes**: Existing Node.js backend applications continue to work without modifications
+- **Browser Safety**: Prevents accidental browser usage with informative error messages
+
+### 📚 Documentation
+- **README.md**: Added dedicated "Frontend Usage (ESM)" section with examples for:
+  - Next.js API routes
+  - Server-side rendering (SSR) with React
+  - Express.js with ESM
+  - Nuxt.js server middleware
+- **Environment Clarification**: Clear documentation that library is for backend/Node.js only
+- **Usage Examples**: Practical code samples for server-side frameworks
+
+### 🔒 Security
+### 🔒 Security
+- **Browser Protection**: Runtime detection prevents insecure browser usage with informative error messages
+- **Dynamic Imports**: xmlrpc library loaded only when needed, preventing browser import errors
+- **Clear Error Messages**: Helpful guidance when used incorrectly in browser environments
+- **Environment Validation**: Constructor validates execution environment before proceeding
+- **Environment Validation**: Constructor validates execution environment before proceeding
+
 ## [3.7.0] - 2025-09-22
 
 ### 🚀 Added
