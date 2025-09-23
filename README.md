@@ -735,7 +735,7 @@ npm test
 
 This project includes a comprehensive Docker setup for testing against multiple Odoo versions simultaneously:
 
-- **Supported Versions**: Odoo 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0
+- **Supported Versions**: Odoo 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0
 - **Automated Setup**: One command initialization
 - **Individual Databases**: Each version has its own PostgreSQL database
 - **Port Mapping**: Sequential ports (12069, 13069, 14069, etc.)
